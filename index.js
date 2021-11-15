@@ -1,21 +1,74 @@
-const http = require("http");
-const PORT = 8081;
 const {
-  listContacts,
+  getListContacts,
   getContactById,
   removeContact,
   addContact,
 } = require("./contacts");
 
-const server = http.createServer(
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact
-);
-server.listen(PORT, (err) => {
-  if (err) {
-    console.error(" Error at aserver launch: ", err);
+const argv = require("yargs").argv;
+
+const invokeAction = async ({ action, id, name, email, phone }) => {
+  switch (action) {
+    case "list":
+      const listContacts = await getListContacts();
+      console.table(listContacts);
+      break;
+
+    case "get":
+      const contactById = await getContactById(id);
+      console.table(contactById);
+      break;
+
+    case "add":
+      await addContact(name, email, phone);
+      break;
+
+    case "remove":
+      await removeContact(id);
+      break;
+
+    default:
+      console.warn("\x1B[31m Unknown action type!");
   }
-  console.log(`Server works at port ${PORT}!`);
-});
+};
+
+invokeAction(argv);
+
+// const { Command } = require("commander");
+// const program = new Command();
+// program
+//   .option("-a, --action <type>", "choose action")
+//   .option("-i, --id <type>", "user id")
+//   .option("-n, --name <type>", "user name")
+//   .option("-e, --email <type>", "user email")
+//   .option("-p, --phone <type>", "user phone");
+
+// program.parse(process.argv);
+
+// const argv = program.opts();
+
+// // TODO: рефакторить
+// function invokeAction({ action, id, name, email, phone }) {
+//   switch (action) {
+//     case "list":
+//       // ...
+//       break;
+
+//     case "get":
+//       // ... id
+//       break;
+
+//     case "add":
+//       // ... name email phone
+//       break;
+
+//     case "remove":
+//       // ... id
+//       break;
+
+//     default:
+//       console.warn("\x1B[31m Unknown action type!");
+//   }
+// }
+
+// invokeAction(argv);
